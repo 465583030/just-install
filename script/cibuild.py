@@ -32,15 +32,17 @@ HERE = os.path.dirname(__file__)
 TOP_LEVEL = os.path.abspath(os.path.join(HERE, ".."))
 
 
-if is_stable_build():
-    with open(os.path.join(TOP_LEVEL, ".releng.json"), "r") as f:
-        VERSION = json.load(f)["version"]
-else:
-    VERSION = "255.0.0"  # Fake version used for unstable builds
+with open(os.path.join(TOP_LEVEL, ".releng.json"), "r") as f:
+    VERSION = json.load(f)["version"]
 
 
 def main():
-    os.environ["JUST_INSTALL_MSI_VERSION"] = VERSION
+    if is_stable_build():
+        os.environ["JUST_INSTALL_MSI_VERSION"] = VERSION
+    else:
+        global VERSION
+        VERSION = "unstable"
+        os.environ["JUST_INSTALL_MSI_VERSION"] = "255.0"
 
     os.chdir(TOP_LEVEL)
 
