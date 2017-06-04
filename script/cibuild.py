@@ -19,6 +19,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import contextlib
 import glob
 import json
 import os
@@ -34,7 +35,6 @@ with open(os.path.join(TOP_LEVEL, ".releng.json"), "r") as f:
 def main():
     os.chdir(TOP_LEVEL)
 
-    os.environ["GOARCH"] = "386"
     os.environ["JUST_INSTALL_MSI_VERSION"] = VERSION
 
     setup()
@@ -64,9 +64,19 @@ def clean():
 
 
 def build():
-    call(
-        "go", "build", "-o", "just-install.exe",
-        "-ldflags", "-X main.version={}".format(VERSION), "./bin")
+    with scoped_environ("GOARCH", "386"):
+        call(
+            "go", "build", "-o", "just-install.exe",
+            "-ldflags", "-X main.version={}".format(VERSION), "./bin")
+
+
+@contextlib.contextmanager
+def scoped_environ(name, value):
+    try:
+        os.environ[name] = value
+        yield
+    finally:
+        del os.environ[name]
 
 
 def build_msi():
@@ -77,7 +87,6 @@ def build_msi():
 def call(*args):
     print("+", " ".join(args))
     check_call(args)
-
 
 if __name__ == "__main__":
     main()
