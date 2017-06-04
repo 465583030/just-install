@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 #
 # just-install - The stupid package installer
 #
@@ -17,33 +17,27 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import glob
+import json
 import os
-import shutil
-import sys
-from subprocess import check_output as get_output
 from subprocess import check_call
 
 HERE = os.path.dirname(__file__)
 
-if sys.platform == "win32":
-    EXE = "just-install.exe"
-else:
-    EXE = "just-install"
+with open(os.path.join(HERE, ".releng.json"), "r") as f:
+    VERSION = json.load(f)["version"]
 
 
 def main():
+    os.environ["GOARCH"] = "386"
+    os.environ["JUST_INSTALL_MSI_VERSION"] = VERSION
+
     setup()
     clean()
     build()
-
-    if sys.platform == "win32":
-        build_msi()
-
-    if "CI" in os.environ:
-        appveyor()
+    build_msi()
 
 
 def setup():
@@ -67,33 +61,14 @@ def clean():
 
 
 def build():
-    version = get_output(["git", "describe", "--tags"])
-
-    # This environment variable is used in just-install.wxs
-    os.environ["JustInstallVersion"] = version[1:6]
-
-    if "CI" in os.environ:
-        os.environ["GOARCH"] = "386"
-
-    if "--skip-tests" not in sys.argv:
-        call("go", "test", "-v")
-
-    call("go", "build", "-o", EXE, "-ldflags", "-X main.version={}".format(version), "./bin")
+    call(
+        "go", "build", "-o", "just-install.exe",
+        "-ldflags", "-X main.version={}".format(VERSION), "./bin")
 
 
 def build_msi():
     call("candle", "just-install.wxs")
     call("light", "just-install.wixobj")
-
-
-def appveyor():
-    if "APPVEYOR_REPO_TAG_NAME" not in os.environ:
-        return
-
-    tag = os.environ["APPVEYOR_REPO_TAG_NAME"]
-
-    shutil.move("just-install.exe", "just-install-{}.exe".format(tag))
-    shutil.move("just-install.msi", "just-install-{}.msi".format(tag))
 
 
 def call(*args):
