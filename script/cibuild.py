@@ -41,7 +41,7 @@ def main():
     if is_stable_build():
         os.environ["JUST_INSTALL_MSI_VERSION"] = VERSION
     else:
-        os.environ["JUST_INSTALL_MSI_VERSION"] = "9001.0.0"  # It's over 9000!
+        os.environ["JUST_INSTALL_MSI_VERSION"] = "99"  # It's over 9000!
 
     clean()
     build()
