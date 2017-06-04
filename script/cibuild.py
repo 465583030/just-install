@@ -43,6 +43,7 @@ def main():
     clean()
     build()
     build_msi()
+    deploy()
 
 
 def clean():
@@ -79,6 +80,31 @@ def scoped_environ(name, value):
 def build_msi():
     call("candle", "just-install.wxs")
     call("light", "just-install.wixobj")
+
+
+def deploy():
+    target = "stable" if "APPVEYOR_REPO_TAG_NAME" in os.environ else "unstable"
+
+    print("Deploying to {}".format(target))
+
+    # Create zip archive for API-driven deployment
+    with zipfile.ZipFile("deploy.zip", "w") as zipfileobj:
+        zipfileobj.write("just-install.exe")
+        zipfileobj.write("just-install.msi")
+
+    # Push zip archive to Netlify
+    deploy_url = "https://api.netlify.com/api/v1/sites/just-install-{}.netlify.com/deploys".format(
+        target)
+
+    with open("deploy.zip", "r") as fileobj:
+        requests.post(
+            deploy_url,
+            data=fileobj,
+            headers={
+                "Authorization": "Bearer {}".format(os.environ["NETLIFY_DEPLOY_TOKEN"]),
+                "Content-Type": "application/zip",
+            },
+            timeout=60)
 
 
 def call(*args):
