@@ -8,7 +8,7 @@ environment:
 build_script:
     - cmd: go get -u github.com/kardianos/govendor
     - cmd: govendor sync
-    - cmd: pip install requests[security]==2.17.3
+    - cmd: pip install requests==2.17.3
     - cmd: .\script\cibuild.py
 artifacts:
     - path: just-install*.exe
