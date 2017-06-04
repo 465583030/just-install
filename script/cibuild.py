@@ -37,6 +37,7 @@ with open(os.path.join(TOP_LEVEL, ".releng.json"), "r") as f:
 
 
 def main():
+    import sys
     print(sys.version)
 
     if is_stable_build():
