@@ -7,6 +7,8 @@ environment:
         secure: JeAo8d6hrQCY73ADrmhWL0LL51VgjexXY2hX4ZxSReaPvUaV3cDOw5P+pAB3ZnIeLVKPcRshq7GwuOPBFRjqWKVnWXOvjFIkzp88Gvb6zEA=
 build_script:
     - cmd: pip install requests
+    - cmd: go get -u github.com/kardianos/govendor
+    - cmd: govendor sync
     - cmd: .\script\cibuild.py
 artifacts:
     - path: just-install*.exe

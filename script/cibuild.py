@@ -26,6 +26,8 @@ import os
 import zipfile
 from subprocess import check_call
 
+import requests
+
 HERE = os.path.dirname(__file__)
 TOP_LEVEL = os.path.abspath(os.path.join(HERE, ".."))
 
@@ -38,22 +40,16 @@ def main():
 
     os.environ["JUST_INSTALL_MSI_VERSION"] = VERSION
 
-    setup()
     clean()
     build()
     build_msi()
 
 
-def setup():
-    call("go", "get", "-u", "github.com/kardianos/govendor")
-    call("govendor", "sync")
-
-
 def clean():
     def remove(*args):
-        for f in args:
+        for arg in args:
             try:
-                os.remove(f)
+                os.remove(arg)
             except:
                 pass
 
@@ -88,6 +84,7 @@ def build_msi():
 def call(*args):
     print("+", " ".join(args))
     check_call(args)
+
 
 if __name__ == "__main__":
     main()
