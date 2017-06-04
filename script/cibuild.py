@@ -32,18 +32,7 @@ HERE = os.path.dirname(__file__)
 TOP_LEVEL = os.path.abspath(os.path.join(HERE, ".."))
 
 
-with open(os.path.join(TOP_LEVEL, ".releng.json"), "r") as f:
-    VERSION = json.load(f)["version"]
-
-
 def main():
-    if is_stable_build():
-        os.environ["JUST_INSTALL_MSI_VERSION"] = VERSION
-    else:
-        global VERSION
-        VERSION = "unstable"
-        os.environ["JUST_INSTALL_MSI_VERSION"] = "255.0"
-
     os.chdir(TOP_LEVEL)
 
     clean()
@@ -68,31 +57,25 @@ def clean():
 
 
 def build():
-    with scoped_environ("GOARCH", "386"):
-        call(
-            "go", "build", "-o", "just-install.exe",
-            "-ldflags", "-X main.version={}".format(VERSION), "./bin")
+    os.environ["GOARCH"] = "386"
 
-
-@contextlib.contextmanager
-def scoped_environ(name, value):
-    try:
-        os.environ[name] = value
-        yield
-    finally:
-        del os.environ[name]
+    call(
+        "go", "build", "-o", "just-install.exe",
+        "-ldflags", "-X main.version={}".format(get_version()), "./bin")
 
 
 def build_msi():
+    if is_stable_build():
+        os.environ["JUST_INSTALL_MSI_VERSION"] = get_version()
+    else:
+        os.environ["JUST_INSTALL_MSI_VERSION"] = "255.0"  # Fake MSI version for unstable builds
+
     call("candle", "just-install.wxs")
     call("light", "just-install.wixobj")
 
 
 def deploy():
-    if is_stable_build():
-        target = "stable"
-    else:
-        target = "unstable"
+    target = "stable" if is_stable_build() else "unstable"
 
     print("Deploying to {}".format(target))
 
@@ -119,6 +102,14 @@ def deploy():
 def call(*args):
     print("+", " ".join(args))
     check_call(args)
+
+
+def get_version():
+    if is_stable_build():
+        with open(os.path.join(TOP_LEVEL, ".releng.json"), "r") as f:
+            return json.load(f)["version"]
+    else:
+        return "unstable"
 
 
 def is_stable_build():
