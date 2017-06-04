@@ -23,6 +23,7 @@ import contextlib
 import glob
 import json
 import os
+import zipfile
 from subprocess import check_call
 
 HERE = os.path.dirname(__file__)

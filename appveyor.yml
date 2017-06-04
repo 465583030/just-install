@@ -3,7 +3,10 @@ environment:
     GOPATH: C:\gopath
     PATH: C:\gopath\bin;%PROGRAMFILES(x86)%\WiX Toolset v3.11\bin;%PATH%
     PYTHONUNBUFFERED: 1
+    NETLIFY_DEPLOY_TOKEN:
+        secure: JeAo8d6hrQCY73ADrmhWL0LL51VgjexXY2hX4ZxSReaPvUaV3cDOw5P+pAB3ZnIeLVKPcRshq7GwuOPBFRjqWKVnWXOvjFIkzp88Gvb6zEA=
 build_script:
+    - cmd: pip install requests
     - cmd: .\script\cibuild.py
 artifacts:
     - path: just-install*.exe
