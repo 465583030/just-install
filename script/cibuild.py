@@ -41,7 +41,7 @@ def main():
     if is_stable_build():
         os.environ["JUST_INSTALL_MSI_VERSION"] = VERSION
     else:
-        os.environ["JUST_INSTALL_MSI_VERSION"] = str(int(VERSION[0]) + 1)
+        os.environ["JUST_INSTALL_MSI_VERSION"] = "255"
 
     clean()
     build()
