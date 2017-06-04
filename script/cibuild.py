@@ -108,7 +108,7 @@ def deploy():
     deploy_url = "https://api.netlify.com/api/v1/sites/just-install-{}.netlify.com/deploys".format(
         target)
 
-    with open("deploy.zip", "r") as fileobj:
+    with open("deploy.zip", "rb") as fileobj:
         requests.post(
             deploy_url,
             data=fileobj,
