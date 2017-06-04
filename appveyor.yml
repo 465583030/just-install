@@ -1,0 +1,10 @@
+clone_folder: C:\gopath\src\github.com\just-install\just-install
+environment:
+    GOPATH: C:\gopath
+    PATH: C:\gopath\bin;%PROGRAMFILES(x86)%\WiX Toolset v3.11\bin;%PATH%
+    PYTHONUNBUFFERED: 1
+build_script:
+    - cmd: .\script\cibuild.py
+artifacts:
+    - path: just-install*.exe
+    - path: just-install*.msi
