@@ -6,7 +6,7 @@ environment:
     NETLIFY_DEPLOY_TOKEN:
         secure: JeAo8d6hrQCY73ADrmhWL0LL51VgjexXY2hX4ZxSReaPvUaV3cDOw5P+pAB3ZnIeLVKPcRshq7GwuOPBFRjqWKVnWXOvjFIkzp88Gvb6zEA=
 build_script:
-    - cmd: pip install requests
+    - cmd: pip install requests[security]==2.17.3
     - cmd: go get -u github.com/kardianos/govendor
     - cmd: govendor sync
     - cmd: .\script\cibuild.py

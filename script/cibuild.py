@@ -38,7 +38,10 @@ with open(os.path.join(TOP_LEVEL, ".releng.json"), "r") as f:
 def main():
     os.chdir(TOP_LEVEL)
 
-    os.environ["JUST_INSTALL_MSI_VERSION"] = VERSION
+    if is_stable_build():
+        os.environ["JUST_INSTALL_MSI_VERSION"] = VERSION
+    else:
+        os.environ["JUST_INSTALL_MSI_VERSION"] = "9999"
 
     clean()
     build()
@@ -83,7 +86,10 @@ def build_msi():
 
 
 def deploy():
-    target = "stable" if "APPVEYOR_REPO_TAG_NAME" in os.environ else "unstable"
+    if is_stable_build():
+        target = "stable"
+    else:
+        target = "unstable"
 
     print("Deploying to {}".format(target))
 
@@ -110,6 +116,10 @@ def deploy():
 def call(*args):
     print("+", " ".join(args))
     check_call(args)
+
+
+def is_stable_build():
+    return "APPVEYOR_REPO_TAG_NAME" in os.environ
 
 
 if __name__ == "__main__":
