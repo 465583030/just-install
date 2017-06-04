@@ -37,6 +37,8 @@ with open(os.path.join(TOP_LEVEL, ".releng.json"), "r") as f:
 
 
 def main():
+    print(sys.version)
+
     if is_stable_build():
         os.environ["JUST_INSTALL_MSI_VERSION"] = VERSION
     else:
